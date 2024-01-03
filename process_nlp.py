@@ -139,15 +139,16 @@ def remove_paragraf_and_toLower(text):
     return text
 
 
-def Rake_Summarizer(text):
+def get_RAKE(text):
     from rake_nltk import Metric, Rake
     r = Rake(language="russian")
     r.extract_keywords_from_text(text)
-    keywords = r.get_ranked_phrases()[:15]
-    print("Rake_Summarizer 0:15")
-    display(keywords)
+    numOfKeywords = 20
+    keywords = r.get_ranked_phrases()[:numOfKeywords]
+    return keywords
 
-def Yake_Summarizer(text):
+
+def get_YAKE(text):
     import yake
     language = "ru"
     max_ngram_size = 3
@@ -155,23 +156,25 @@ def Yake_Summarizer(text):
     numOfKeywords = 20
     custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
     keywords = custom_kw_extractor.extract_keywords(text)
-    print("Yake_Summarizer")
-    display(keywords)
+    return keywords
 
-def nltk_download():
-    nltk.download('stopwords')
-    nltk.download('punkt')
 
-    
 def get_KeyBERT(text):
     from keybert import KeyBERT
     kw_model = KeyBERT()
     # keywords = kw_model.extract_keywords(doc)
+    numOfKeywords = 20
     keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english',
-                            use_maxsum=True, nr_candidates=20, top_n=10)
-    print("KeyBERT")
-    display(keywords)
+                            use_maxsum=True, nr_candidates=20, top_n=numOfKeywords)
+    return keywords
 
+
+
+def nltk_download():
+    nltk.download('stopwords')
+    nltk.download('punkt')
+    
+    
 
 def find_cl(filename):
     
