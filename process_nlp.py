@@ -196,6 +196,19 @@ def get_pattern(text):
     return line
 
 
+def add_print_text(data):
+    str1 = str(f"Исходный текст: {data['text']} \n\n"
+            f"Очищенный текст: {data['remove_all']} \n\n"
+            f" Нормальная форма: {data['normal_form']} \n\n"
+            f" RAKE: {data['RAKE']} \n\n"
+            f" YAKE: {data['YAKE']} \n\n"
+            f" BERT: {data['BERT']} \n\n")
+    data['print_text'] = str1
+    print(str1)
+    return data
+
+
+
 def get_normal_form_mas(words):
     morph = pymorphy2.MorphAnalyzer()
     result = []
@@ -238,7 +251,15 @@ def nltk_download():
     nltk.download('stopwords')
     nltk.download('punkt')
     
-    
+
+def calc_intersection_one(text1, text2):
+    count = 0
+    for item1 in text1.split():
+        for item2 in text2.split():
+            if item1 == item2:
+                count += 1
+    return count
+
 
 def find_cl(filename):
     
@@ -246,13 +267,7 @@ def find_cl(filename):
     data_cl = load_db()
     ae_messages = []
 
-    def calc_intersection_one(text1, text2):
-        count = 0
-        for item1 in text1.split():
-            for item2 in text2.split():
-                if item1 == item2:
-                    count += 1
-        return count
+
 
     def calc_intersection_all(text1, l2):
         max_counts = 0
@@ -298,6 +313,7 @@ if __name__ == '__main__':
     # # t = get_normal_form(remove_all(data))
     t = get_pattern(data)
     print(t)
+    print(len(t['RAKE']))
 
     # t = remove_all(data)
     # print("remove_all")
