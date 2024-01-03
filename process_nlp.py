@@ -166,7 +166,10 @@ def get_YAKE(text):
     numOfKeywords = 20
     custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
     keywords = custom_kw_extractor.extract_keywords(text)
-    return keywords
+    l=[]
+    for item in keywords:
+        l.append(list(item))
+    return l
 
 
 def get_KeyBERT(text):
@@ -176,7 +179,10 @@ def get_KeyBERT(text):
     numOfKeywords = 20
     keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english',
                             use_maxsum=True, nr_candidates=20, top_n=numOfKeywords)
-    return keywords
+    l=[]
+    for item in keywords:
+        l.append(list(item))
+    return l
 
 
 def get_pattern(text):
@@ -287,7 +293,7 @@ def find_cl(filename):
 
 
 if __name__ == '__main__':
-    nltk_download()
+    # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
     # # t = get_normal_form(remove_all(data))
     t = get_pattern(data)
