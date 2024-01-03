@@ -185,12 +185,19 @@ def get_KeyBERT(text):
     return l
 
 
+def set_scores(l):
+    count = len(l)
+    new_l=[]
+    for item in l:
+        new_l.append([item, 1/count])
+    return new_l
+
 def get_pattern(text):
     line = {}
     line['text'] = text.strip()
     line['remove_all'] = remove_all(text).strip()
-    line['normal_form'] = get_normal_form(remove_all(text)).strip()
-    line['RAKE'] = get_RAKE(text)
+    line['normal_form'] = get_normal_form(remove_all(text).strip())
+    line['RAKE'] = set_scores(get_RAKE(text))
     line['YAKE'] = get_YAKE(text)
     line['BERT'] = get_KeyBERT(text)
     return line
@@ -304,16 +311,13 @@ def find_cl(filename):
     return jsonstring   
 
 
-
-
-
 if __name__ == '__main__':
     # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
     # # t = get_normal_form(remove_all(data))
     t = get_pattern(data)
     print(t)
-    print(len(t['RAKE']))
+
 
     # t = remove_all(data)
     # print("remove_all")
