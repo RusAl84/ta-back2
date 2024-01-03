@@ -89,15 +89,104 @@ def data_proc(filename):
         file.write(jsonstring)
     return proc_messages
 
+def remove_digit(data):
+    str2 = ''
+    for c in data:
+        if c not in ('0', "1", '2', '3', '4', '5', '6', '7', '8', '9', '«', '»', '–', "\""):
+            str2 = str2 + c
+    data = str2
+    return data
+
+
+def remove_punctuation(data):
+    str2 = ''
+    import string
+    pattern = string.punctuation
+    for c in data:
+        if c not in pattern:
+            str2 = str2 + c
+        else:
+            str2 = str2 + ""
+    data = str2
+    return data
+
+
+def remove_stopwords(data):
+    str2 = ''
+    from nltk.corpus import stopwords
+    russian_stopwords = stopwords.words("russian")
+    for word in data.split():
+        if word not in (russian_stopwords):
+            str2 = str2 + " " + word
+    data = str2
+    return data
+
+
+def remove_short_words(data, length=1):
+    str2 = ''
+    for line in data.split("\n"):
+        str3 = ""
+        for word in line.split():
+            if len(word) > length:
+                str3 += " " + word
+        str2 = str2 + "\n" + str3
+    data = str2
+    return data
+
+
+def remove_paragraf_to_lower(data):
+    data = data.lower()
+    data = data.replace('\n', ' ')
+    return data
+
+
+def remove_all(data):
+    data = remove_digit(data)
+    data = remove_punctuation(data)
+    data = remove_stopwords(data)
+    data = remove_short_words(data, length=3)
+    data = remove_paragraf_to_lower(data)
+    return data
+
+
+def get_RAKE(text):
+    from rake_nltk import Metric, Rake
+    r = Rake(language="russian")
+    r.extract_keywords_from_text(text)
+    numOfKeywords = 20
+    keywords = r.get_ranked_phrases()[:numOfKeywords]
+    return keywords
+
+
+def get_YAKE(text):
+    import yake
+    language = "ru"
+    max_ngram_size = 3
+    deduplication_threshold = 0.9
+    numOfKeywords = 20
+    custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
+    keywords = custom_kw_extractor.extract_keywords(text)
+    return keywords
+
+
+def get_KeyBERT(text):
+    from keybert import KeyBERT
+    kw_model = KeyBERT()
+    # keywords = kw_model.extract_keywords(doc)
+    numOfKeywords = 20
+    keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english',
+                            use_maxsum=True, nr_candidates=20, top_n=numOfKeywords)
+    return keywords
+
 
 def get_pattern(text):
     line = {}
-    # line['text'] = text.strip()
-    # line['remove_all'] = remove_all(text).strip()
-    # line['normal_form'] = get_normal_form(remove_all(text)).strip()
-    # line['Rake_Summarizer'] = Rake_Summarizer(text).strip()
-    # line['YakeSummarizer'] = YakeSummarizer(text).strip()
-    # line['BERT_Summarizer'] = BERT_Summarizer(text).strip()
+    line['text'] = text.strip()
+    line['remove_all'] = remove_all(text).strip()
+    line['normal_form'] = get_normal_form(remove_all(text)).strip()
+    line['RAKE'] = get_RAKE(text)
+    line['YAKE'] = get_YAKE(text)
+    line['BERT'] = get_KeyBERT(text)
     return line
 
 
@@ -137,37 +226,6 @@ def remove_paragraf_and_toLower(text):
     text = text.replace('\n', ' ')
     text = ' '.join([k for k in text.split(" ") if k])
     return text
-
-
-def get_RAKE(text):
-    from rake_nltk import Metric, Rake
-    r = Rake(language="russian")
-    r.extract_keywords_from_text(text)
-    numOfKeywords = 20
-    keywords = r.get_ranked_phrases()[:numOfKeywords]
-    return keywords
-
-
-def get_YAKE(text):
-    import yake
-    language = "ru"
-    max_ngram_size = 3
-    deduplication_threshold = 0.9
-    numOfKeywords = 20
-    custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
-    keywords = custom_kw_extractor.extract_keywords(text)
-    return keywords
-
-
-def get_KeyBERT(text):
-    from keybert import KeyBERT
-    kw_model = KeyBERT()
-    # keywords = kw_model.extract_keywords(doc)
-    numOfKeywords = 20
-    keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english',
-                            use_maxsum=True, nr_candidates=20, top_n=numOfKeywords)
-    return keywords
-
 
 
 def nltk_download():
@@ -232,8 +290,8 @@ if __name__ == '__main__':
     nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
     # # t = get_normal_form(remove_all(data))
-    # t = get_pattern(data)
-    # print(t)
+    t = get_pattern(data)
+    print(t)
 
     # t = remove_all(data)
     # print("remove_all")
