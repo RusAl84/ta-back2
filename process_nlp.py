@@ -226,6 +226,7 @@ def find_cl(filename):
 
 
 if __name__ == '__main__':
+    nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
     # # t = get_normal_form(remove_all(data))
     # t = get_pattern(data)
