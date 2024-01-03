@@ -1,8 +1,8 @@
-import string
-from nltk.corpus import stopwords
-import pymorphy2
-import json
 import os
+import json
+import nltk
+import pymorphy2
+
 
 db_fileName = "./data_cl.json"
 
@@ -116,7 +116,64 @@ def get_normal_form(words):
     return p.normal_form
 
 
-def find_ae(filename):
+def load_data(filename='data.txt'):
+    with open(filename, "r", encoding='utf-8') as file:
+        data = file.read()
+    return data
+
+def remove_from_patterns(text, pattern):
+    str2 = ''
+    for c in text:
+        if c not in pattern:
+            str2 = str2 + c
+    return str2
+
+def display(text):
+    print(text) 
+    print("--------------------------------")
+
+def remove_paragraf_and_toLower(text):
+    text = text.lower()
+    text = text.replace('\n', ' ')
+    text = ' '.join([k for k in text.split(" ") if k])
+    return text
+
+
+def Rake_Summarizer(text):
+    from rake_nltk import Metric, Rake
+    r = Rake(language="russian")
+    r.extract_keywords_from_text(text)
+    keywords = r.get_ranked_phrases()[:15]
+    print("Rake_Summarizer 0:15")
+    display(keywords)
+
+def Yake_Summarizer(text):
+    import yake
+    language = "ru"
+    max_ngram_size = 3
+    deduplication_threshold = 0.9
+    numOfKeywords = 20
+    custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_threshold, top=numOfKeywords, features=None)
+    keywords = custom_kw_extractor.extract_keywords(text)
+    print("Yake_Summarizer")
+    display(keywords)
+
+def nltk_download():
+    nltk.download('stopwords')
+    nltk.download('punkt')
+
+    
+def get_KeyBERT(text):
+    from keybert import KeyBERT
+    kw_model = KeyBERT()
+    # keywords = kw_model.extract_keywords(doc)
+    keywords = kw_model.extract_keywords(text, keyphrase_ngram_range=(1, 3), stop_words='english',
+                            use_maxsum=True, nr_candidates=20, top_n=10)
+    print("KeyBERT")
+    display(keywords)
+
+
+def find_cl(filename):
     
     proc_messages = data_proc(filename)
     data_cl = load_db()
@@ -165,8 +222,11 @@ def find_ae(filename):
     return jsonstring   
 
 
+
+
+
 if __name__ == '__main__':
-    # data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
+    data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
     # # t = get_normal_form(remove_all(data))
     # t = get_pattern(data)
     # print(t)
