@@ -6,10 +6,12 @@ import pymorphy2
 
 db_fileName = "./data_cl.json"
 
-def add_data(data):
+def add_data(text):
     import pathlib
     path = pathlib.Path(db_fileName)
     content = []
+    data = get_pattern(text)
+    data = add_print_text(data)
     if path.exists():
         with open(db_fileName, "r", encoding="UTF8") as file:
             jsoncontent = file.read()
@@ -74,6 +76,12 @@ def data_proc(filename, save_filename):
     with open(save_filename, "w", encoding="UTF8") as file:
         file.write(jsonstring)
     # return proc_messages
+
+def load_data_proc(filename):
+    with open(filename, "r", encoding="UTF8") as file:
+        content = file.read()
+    messages = json.loads(content)
+    return messages
 
 def remove_digit(data):
     str2 = ''
@@ -257,13 +265,10 @@ def calc_score(data1, data2):
     pass
 
 
-
-
 def find_cl(filename):
-    
-    proc_messages = data_proc(filename)
+    messages = load_data_proc(filename)
     data_cl = load_db()
-    ae_messages = []
+    cl_messages = []
     def calc_intersection_all(text1, l2):
         max_counts = 0
         for item in l2:
@@ -272,31 +277,31 @@ def find_cl(filename):
                 max_counts = current_counts
         return max_counts
     counts = []
-    for m in proc_messages:
+    for m in messages:
         intersect = calc_intersection_all(m['normal_form'], data_cl)
         counts.append(intersect)
-    max_counts=max(counts)
-    indices = [i for i, x in enumerate(counts) if x == max_counts]
-    print(max(counts))
-    print(indices)
-    print(len(indices))
-    for ind in indices:
-        m = proc_messages[ind]
-        if len(m['text'])>30:
-            line = {}
-            line['text'] = m['text']
-            line['date'] = m['date']
-            line['remove_all'] =  m['remove_all']
-            line['normal_form'] =  m['normal_form']
-            line['message_id'] = m['message_id']
-            line['user_id'] = m['user_id']
-            line['reply_message_id'] = m['reply_message_id']
-        ae_messages.append(line)   
-    jsonstring = json.dumps(ae_messages, ensure_ascii=False)
-    name = filename.split(".")[0]
-    with open(f"./uploads/{name}_ae.json", "w", encoding="UTF8") as file:
-        file.write(jsonstring)
-    return jsonstring   
+    # max_counts=max(counts)
+    # indices = [i for i, x in enumerate(counts) if x == max_counts]
+    # print(max(counts))
+    # print(indices)
+    # print(len(indices))
+    # for ind in indices:
+    #     m = proc_messages[ind]
+    #     if len(m['text'])>30:
+    #         line = {}
+    #         line['text'] = m['text']
+    #         line['date'] = m['date']
+    #         line['remove_all'] =  m['remove_all']
+    #         line['normal_form'] =  m['normal_form']
+    #         line['message_id'] = m['message_id']
+    #         line['user_id'] = m['user_id']
+    #         line['reply_message_id'] = m['reply_message_id']
+    #     ae_messages.append(line)   
+    # jsonstring = json.dumps(ae_messages, ensure_ascii=False)
+    # name = filename.split(".")[0]
+    # with open(f"./uploads/{name}_ae.json", "w", encoding="UTF8") as file:
+    #     file.write(jsonstring)
+    # return jsonstring   
 
 
 def convertMs2String(milliseconds):
@@ -319,11 +324,21 @@ def convertJsonMessages2text(filename):
 if __name__ == '__main__':
     # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
-    t = get_pattern(data)
-    print(t)
+    s1 = """
+    Завтра в "Папа Джонс" самый черный пятничный праздник!🖤
+    Мы знаем, что ты так же обожаешь скидки, поэтому держи подарок от нас - 100% начисления Black CashBack за все заказы 24.11.2023. 
+    Успей воспользоваться Black CashBack, потому что он действует всего 3 дня!
+
+    Такая возможность выпадает раз в году – съесть пиццу и получить такой огромный Black CashBack!
+
+    Время тикает!
+    """
+    add_data(s1)
+    # t = get_pattern(data)
+    # print(t)
 
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
-    data_proc(filename, save_filename)
-    # ae = find_ae(filename)
-    # print(ae)
+    # data_proc(filename, save_filename)
+    # mess = find_cl(save_filename)
+    # print(mess)
