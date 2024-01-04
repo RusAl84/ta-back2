@@ -57,7 +57,7 @@ def data_proc(filename, save_filename):
     proc_messages = []  
     for m in messages:
         text = m["text"]
-        print(f"{count_messages-num}     {num} / {count_messages}")
+        print(f"{num / count_messages * 100}     {count_messages-num}     {num} / {count_messages}")
         num += 1
         # if len(text) < 10:
         #     continue
@@ -319,11 +319,8 @@ def convertJsonMessages2text(filename):
 if __name__ == '__main__':
     # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
-    # # t = get_normal_form(remove_all(data))
     t = get_pattern(data)
     print(t)
-
-
 
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
