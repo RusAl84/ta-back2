@@ -47,7 +47,7 @@ def clear_db():
         os.remove(db_fileName)
 
 
-def data_proc(filename, save_filename):
+def data_proc(filename, save_filename, threshold=0):
     # with open("./uploads/"+filename+".json", "r", encoding="UTF8") as file:
     with open(filename, "r", encoding="UTF8") as file:
         content = file.read()
@@ -61,8 +61,8 @@ def data_proc(filename, save_filename):
         text = m["text"]
         print(f"{num / count_messages * 100}     {count_messages-num}     {num} / {count_messages}")
         num += 1
-        # if len(text) < 10:
-        #     continue
+        if len(text) < threshold:
+            continue
         line = get_pattern(text)
         line["date"] = m["date"]
         line["message_id"] = m["message_id"]
@@ -256,6 +256,15 @@ def calc_intersection_list(list1, list2):
     count = 0
     for item1 in list1:
         for item2 in list2:
+            count += calc_intersection_text(item1, item2)
+    return count
+
+def calc_intersection_text(text1, text2):
+    count = 0
+    text1 = str(text1)
+    text2 = str(text2)
+    for item1 in text1.split():
+        for item2 in text2.split():
             if item1 == item2:
                 count += 1
     return count
@@ -286,7 +295,7 @@ def find_cl(filename, type='RAKE'):
         item["YAKE_NUM"] = 0
         item["BERT_COUNT"] = 0
         item["BERT_NUM"] = 0
-        for cl in cl_messages:
+        for cl in data_cl:
             intersect_RAKE = calc_intersection_list(m['RAKE'], cl['RAKE'])
             if intersect_RAKE>item["RAKE_COUNT"]:
                 item["RAKE_COUNT"] = intersect_RAKE
@@ -365,6 +374,6 @@ if __name__ == '__main__':
 
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
-    # data_proc(filename, save_filename)
+    # data_proc(filename, save_filename, 32)
     find_cl(save_filename)
     
