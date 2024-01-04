@@ -27,7 +27,7 @@ def uploadae():
         # f.save('./uploads/%s' % secure_filename(fname))
         full_filename = f"./uploads/{milliseconds}.json"
         f.save(full_filename)
-        text = conv.convertJsonMessages2text(full_filename)
+        text = process_nlp.convertJsonMessages2text(full_filename)
         d = {}
         d['text'] = text
         d['filename'] = filename
@@ -39,15 +39,7 @@ def get_pattern():
     msg = request.json
     print(msg)
     data = process_nlp.get_pattern(msg['text'])
-    str1 = str(f"Исходный текст: {data['text']} \n\n"
-               f"Очищенный текст: {data['remove_all']} \n\n"
-               f" Нормальная форма ключевых слов: {data['normal_form']} \n\n"
-               f" YakeSummarizer: {data['YakeSummarizer']} \n\n"
-               f" BERT_Summarizer: {data['BERT_Summarizer']} \n\n"
-               f" Rake_Summarizer: {data['Rake_Summarizer']} \n\n")
-    # process_nlp.add_data(data)
-    data['print_text'] = str1
-    print(str1)
+    print(data['print_text'])
     return data
 
 
@@ -67,7 +59,7 @@ def findae():
     msg = str(request.json)
     print(msg)
     filename = msg
-    data = process_nlp.find_ae(filename)
+    data = process_nlp.find_cl(filename)
     print(data)
     return data
 
