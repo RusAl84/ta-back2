@@ -332,11 +332,14 @@ def find_type(filename, type='RAKE'):
     YAKE_set=sorted(YAKE_set, reverse=True)
     BERT_set=sorted(BERT_set, reverse=True)
     
-    for s in RAKE_set:
-        for m in messages:
-            if m['RAKE_COUNT'] == s:
-                m = add_print_text(m)
-                find_data.append(m['print_text'])
+    if type == 'RAKE':
+        for s in RAKE_set:
+            for m in messages:
+                if m['RAKE_COUNT'] == s:
+                    m = add_print_text(m)
+                    find_data.append(m['print_text'])
+                    
+                    
     jsonstring = json.dumps(find_data, ensure_ascii=False)
     with open("./find_d.json", "w", encoding="UTF8") as file:
         file.write(jsonstring)
