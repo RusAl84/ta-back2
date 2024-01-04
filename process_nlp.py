@@ -205,9 +205,8 @@ def add_print_text(data):
             f" YAKE: {data['YAKE']} \n\n"
             f" BERT: {data['BERT']} \n\n")
     data['print_text'] = str1
-    print(str1)
+    # print(str1)
     return data
-
 
 
 def get_normal_form_mas(words):
@@ -253,10 +252,10 @@ def nltk_download():
     nltk.download('punkt')
     
 
-def calc_intersection_one(text1, text2):
+def calc_intersection_list(list1, list2):
     count = 0
-    for item1 in text1.split():
-        for item2 in text2.split():
+    for item1 in list1:
+        for item2 in list2:
             if item1 == item2:
                 count += 1
     return count
@@ -265,21 +264,48 @@ def calc_score(data1, data2):
     pass
 
 
-def find_cl(filename):
+def find_cl(filename, type='RAKE'):
     messages = load_data_proc(filename)
     data_cl = load_db()
     cl_messages = []
-    def calc_intersection_all(text1, l2):
-        max_counts = 0
-        for item in l2:
-            current_counts = calc_intersection_one(text1, item['normal_form'])
-            if current_counts > max_counts:
-                max_counts = current_counts
-        return max_counts
-    counts = []
+    # def calc_intersection_all(text1, l2):
+    #     max_counts = 0
+    #     for item in l2:
+    #         current_counts = calc_intersection_one(text1, item['normal_form'])
+    #         if current_counts > max_counts:
+    #             max_counts = current_counts
+    #     return max_counts
+    # counts = []
+    find_data = []
     for m in messages:
-        intersect = calc_intersection_all(m['normal_form'], data_cl)
-        counts.append(intersect)
+        item = m
+        num = 0
+        item["RAKE_COUNT"] = 0
+        item["RAKE_NUM"] = 0
+        item["YAKE_COUNT"] = 0
+        item["YAKE_NUM"] = 0
+        item["BERT_COUNT"] = 0
+        item["BERT_NUM"] = 0
+        for cl in cl_messages:
+            intersect_RAKE = calc_intersection_list(m['RAKE'], cl['RAKE'])
+            if intersect_RAKE>item["RAKE_COUNT"]:
+                item["RAKE_COUNT"] = intersect_RAKE
+                item["RAKE_NUM"] = num
+            intersect_YAKE = calc_intersection_list(m['YAKE'], cl['YAKE'])
+            if intersect_YAKE>item["YAKE_COUNT"]:
+                item["YAKE_COUNT"] = intersect_YAKE
+                item["YAKE_NUM"] = num
+            intersect_BERT = calc_intersection_list(m['BERT'], cl['BERT'])
+            if intersect_BERT>item["BERT_COUNT"]:
+                item["BERT_COUNT"] = intersect_BERT
+                item["BERT_NUM"] = num
+            num += 1
+        find_data.append(item)
+    jsonstring = json.dumps(find_data, ensure_ascii=False)
+    with open("./find_data.json", "w", encoding="UTF8") as file:
+        file.write(jsonstring)
+    
+    
     # max_counts=max(counts)
     # indices = [i for i, x in enumerate(counts) if x == max_counts]
     # print(max(counts))
@@ -333,12 +359,12 @@ if __name__ == '__main__':
 
     Время тикает!
     """
-    add_data(s1)
+    # add_data(s1)
     # t = get_pattern(data)
     # print(t)
 
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
     # data_proc(filename, save_filename)
-    # mess = find_cl(save_filename)
-    # print(mess)
+    find_cl(save_filename)
+    
