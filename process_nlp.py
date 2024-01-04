@@ -45,54 +45,40 @@ def clear_db():
         os.remove(db_fileName)
 
 
-def data_proc(filename):
-    with open("./uploads/"+filename+".json", "r", encoding="UTF8") as file:
+def data_proc(filename, save_filename):
+    # with open("./uploads/"+filename+".json", "r", encoding="UTF8") as file:
+    with open(filename, "r", encoding="UTF8") as file:
         content = file.read()
     messages = json.loads(content)
     text = ""
     count_messages = len(messages)
     print(count_messages)
-    texts = []
-    for m in messages:
-        text = m['text']
-        # texts.append(remove_all_mas(text))
     num = 0
-    # ltexts = d2lemmatize(texts)
-    proc_messages = []
+    proc_messages = []  
     for m in messages:
-        line = {}
-        line['date'] = m['date']
-        text = m['text']
-        line['text'] = text
-        # line['remove_all'] = remove_all(text)
-        # print(str(texts[num]))
-        # print(text)
-        str1 = ""
-        # for item in ltexts[num]:
-        #     if len(str(item)) > 3:
-        #         str1 += item
-        line['normal_form'] = str(str1).strip()
-        # line['get_normal_form'] = get_normal_form(remove_all(data))
-        # line['Rake_Summarizer'] = Rake_Summarizer(data)
-        # line['YakeSummarizer'] = YakeSummarizer(data)
-        line['message_id'] = m['message_id']
-        line['user_id'] = m['user_id']
-        line['reply_message_id'] = m['reply_message_id']
-        proc_messages.append(line)
-        print(f"{num} / {count_messages}")
+        text = m["text"]
+        print(f"{count_messages-num}     {num} / {count_messages}")
         num += 1
-
+        # if len(text) < 10:
+        #     continue
+        line = get_pattern(text)
+        line["date"] = m["date"]
+        line["message_id"] = m["message_id"]
+        line["user_id"] = m["user_id"]
+        line["reply_message_id"] = m["reply_message_id"]
+        proc_messages.append(line)
     jsonstring = json.dumps(proc_messages, ensure_ascii=False)
     # print(jsonstring)
-    name = filename.split(".")[0]
-    with open(f"./uploads/{name}_proc.json", "w", encoding="UTF8") as file:
+    # name = filename.split(".")[0]
+    # with open(f"./uploads/{name}_proc.json", "w", encoding="UTF8") as file:
+    with open(save_filename, "w", encoding="UTF8") as file:
         file.write(jsonstring)
-    return proc_messages
+    # return proc_messages
 
 def remove_digit(data):
     str2 = ''
     for c in data:
-        if c not in ('0', "1", '2', '3', '4', '5', '6', '7', '8', '9', '«', '»', '–', "\""):
+        if c not in ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '«', '»', '–', "\""):
             str2 = str2 + c
     data = str2
     return data
@@ -267,15 +253,17 @@ def calc_intersection_one(text1, text2):
                 count += 1
     return count
 
+def calc_score(data1, data2):
+    pass
+
+
+
 
 def find_cl(filename):
     
     proc_messages = data_proc(filename)
     data_cl = load_db()
     ae_messages = []
-
-
-
     def calc_intersection_all(text1, l2):
         max_counts = 0
         for item in l2:
@@ -311,6 +299,23 @@ def find_cl(filename):
     return jsonstring   
 
 
+def convertMs2String(milliseconds):
+    import datetime
+    dt = datetime.datetime.fromtimestamp(milliseconds )
+    return dt
+
+
+
+def convertJsonMessages2text(filename):
+    with open(filename, "r", encoding="UTF8") as file:
+        content = file.read()
+    messages = json.loads(content)
+    text = ""
+    for m in messages:
+        text += f"{convertMs2String(m['date'])} {m['message_id']}  {m['user_id']} {m['reply_message_id']}  {m['text']}  <br>\n"
+    return text
+
+
 if __name__ == '__main__':
     # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
@@ -319,22 +324,9 @@ if __name__ == '__main__':
     print(t)
 
 
-    # t = remove_all(data)
-    # print("remove_all")
-    # print(t)
-    # t = get_normal_form(remove_all(data))
-    # print("norm")
-    # print(t)
-    # t = Rake_Summarizer(data)
-    # print("Rake_Summarizer")
-    # print(t)
-    # # t = BERT_Summarizer(data)
-    # # print("BERT_Summarizer")
-    # # print(t)
-    # t = YakeSummarizer(data)
-    # print("YakeSummarizer")
-    # print(t)
-    # data_proc("d:/ml/chat/andromedica.json")
-    filename="d:/ml/chat/andromedica.json"
+
+    filename="d:/ml/chat/andromedica1.json"
+    save_filename="./data_proc.json"
+    data_proc(filename, save_filename)
     # ae = find_ae(filename)
     # print(ae)
