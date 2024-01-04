@@ -83,6 +83,7 @@ def load_data_proc(filename):
     messages = json.loads(content)
     return messages
 
+
 def remove_digit(data):
     str2 = ''
     for c in data:
@@ -199,7 +200,6 @@ def get_pattern(text):
 
 def add_print_text(data):
     str1 = str(f"Исходный текст: {data['text']} \n\n"
-            f"Очищенный текст: {data['remove_all']} \n\n"
             f" Нормальная форма: {data['normal_form']} \n\n"
             f" RAKE: {data['RAKE']} \n\n"
             f" YAKE: {data['YAKE']} \n\n"
@@ -273,7 +273,7 @@ def calc_score(data1, data2):
     pass
 
 
-def find_cl(filename, type='RAKE'):
+def find_cl(filename):
     messages = load_data_proc(filename)
     data_cl = load_db()
     cl_messages = []
@@ -313,37 +313,40 @@ def find_cl(filename, type='RAKE'):
     jsonstring = json.dumps(find_data, ensure_ascii=False)
     with open("./find_data.json", "w", encoding="UTF8") as file:
         file.write(jsonstring)
+
+
+def find_type(filename, type='RAKE'):
+    messages = load_data_proc(filename)
+    find_data = []
+    RAKE_set=set() 
+    YAKE_set=set() 
+    BERT_set=set() 
+    for m in messages:
+        RAKE_set.add(m['RAKE_COUNT'])
+        YAKE_set.add(m['YAKE_COUNT'])
+        BERT_set.add(m['BERT_COUNT'])
+    RAKE_set.remove(0)
+    YAKE_set.remove(0)
+    BERT_set.remove(0)
+    RAKE_set=sorted(RAKE_set, reverse=True)
+    YAKE_set=sorted(YAKE_set, reverse=True)
+    BERT_set=sorted(BERT_set, reverse=True)
     
-    
-    # max_counts=max(counts)
-    # indices = [i for i, x in enumerate(counts) if x == max_counts]
-    # print(max(counts))
-    # print(indices)
-    # print(len(indices))
-    # for ind in indices:
-    #     m = proc_messages[ind]
-    #     if len(m['text'])>30:
-    #         line = {}
-    #         line['text'] = m['text']
-    #         line['date'] = m['date']
-    #         line['remove_all'] =  m['remove_all']
-    #         line['normal_form'] =  m['normal_form']
-    #         line['message_id'] = m['message_id']
-    #         line['user_id'] = m['user_id']
-    #         line['reply_message_id'] = m['reply_message_id']
-    #     ae_messages.append(line)   
-    # jsonstring = json.dumps(ae_messages, ensure_ascii=False)
-    # name = filename.split(".")[0]
-    # with open(f"./uploads/{name}_ae.json", "w", encoding="UTF8") as file:
-    #     file.write(jsonstring)
-    # return jsonstring   
+    for s in RAKE_set:
+        for m in messages:
+            if m['RAKE_COUNT'] == s:
+                m = add_print_text(m)
+                find_data.append(m['print_text'])
+    jsonstring = json.dumps(find_data, ensure_ascii=False)
+    with open("./find_d.json", "w", encoding="UTF8") as file:
+        file.write(jsonstring)
+
 
 
 def convertMs2String(milliseconds):
     import datetime
     dt = datetime.datetime.fromtimestamp(milliseconds )
     return dt
-
 
 
 def convertJsonMessages2text(filename):
@@ -356,24 +359,22 @@ def convertJsonMessages2text(filename):
     return text
 
 
+
+
 if __name__ == '__main__':
     # nltk_download()
     data = "«Два самых важных дня в твоей жизни: день, когда ты появился на свет, и день, когда ты понял зачем!». — Марк Твен"
-    s1 = """
-    Завтра в "Папа Джонс" самый черный пятничный праздник!🖤
-    Мы знаем, что ты так же обожаешь скидки, поэтому держи подарок от нас - 100% начисления Black CashBack за все заказы 24.11.2023. 
-    Успей воспользоваться Black CashBack, потому что он действует всего 3 дня!
-
-    Такая возможность выпадает раз в году – съесть пиццу и получить такой огромный Black CashBack!
-
-    Время тикает!
-    """
-    # add_data(s1)
+    #     s1 = """
+    # Дарим 1000 бонусов за 1-ю авторизацию в мобильном приложении до 22.03.2023. Используйте бонусы на онлайн покупки. Clck.ru/33gyhM
+    #     """
+    #     add_data(s1)
     # t = get_pattern(data)
     # print(t)
 
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
+    
     # data_proc(filename, save_filename, 32)
-    find_cl(save_filename)
+    # find_cl(save_filename)
+    find_type("./find_data.json")
     
