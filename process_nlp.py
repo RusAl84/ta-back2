@@ -338,12 +338,21 @@ def find_type(filename, type='RAKE'):
                 if m['RAKE_COUNT'] == s:
                     m = add_print_text(m)
                     find_data.append(m['print_text'])
-                    
-                    
+    if type == 'YAKE':
+        for s in RAKE_set:
+            for m in messages:
+                if m['YAKE_COUNT'] == s:
+                    m = add_print_text(m)
+                    find_data.append(m['print_text'])                    
+    if type == 'BERT':
+        for s in RAKE_set:
+            for m in messages:
+                if m['BERT_COUNT'] == s:
+                    m = add_print_text(m)
+                    find_data.append(m['print_text'])                     
     jsonstring = json.dumps(find_data, ensure_ascii=False)
     with open("./find_d.json", "w", encoding="UTF8") as file:
         file.write(jsonstring)
-
 
 
 def convertMs2String(milliseconds):
