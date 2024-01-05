@@ -183,8 +183,10 @@ def get_KeyBERT(text):
 def set_scores(l):
     count = len(l)
     new_l=[]
+    import random
+    random.uniform(0, 1)
     for item in l:
-        new_l.append([item, 1/count])
+        new_l.append([item, random.uniform(0, 1)])
     return new_l
 
 def get_pattern(text):
@@ -341,7 +343,7 @@ def find_type(filename, type='RAKE'):
     # RAKE_set=sorted(RAKE_set, reverse=True)
     # YAKE_set=sorted(YAKE_set, reverse=True)
     # BERT_set=sorted(BERT_set, reverse=True)
-    counts=2
+    counts=3
     if type == 'RAKE':
         for m in messages:
             if m['RAKE_COUNT'] >= RAKE_s-counts:
@@ -394,7 +396,7 @@ if __name__ == '__main__':
     filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
     
-    # data_proc(filename, save_filename, 32)
-    # find_cl(save_filename)
+    data_proc(filename, save_filename, 32)
+    find_cl(save_filename)
     find_type("./find_data.json", 'RAKE')
     

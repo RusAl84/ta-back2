@@ -48,7 +48,7 @@ def get_pattern():
 def get_pattern_add():
     msg = request.json
     print(msg)
-    data = process_nlp.add_data(msg)
+    data = process_nlp.add_data(msg['text'])
     data = process_nlp.add_print_text(data)
     print()
     print(data)
