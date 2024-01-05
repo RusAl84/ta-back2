@@ -199,11 +199,21 @@ def get_pattern(text):
 
 
 def add_print_text(data):
+    RAKE_text =[]
+    for item in data['RAKE']:
+        RAKE_text.append(item[0])
+    YAKE_text =[]
+    for item in data['YAKE']:
+        YAKE_text.append(item[0])    
+    BERT_text =[]
+    for item in data['BERT']:
+        BERT_text.append(item[0])
+    
     str1 = str(f"Исходный текст: {data['text']} \n\n"
             f" Нормальная форма: {data['normal_form']} \n\n"
-            f" RAKE: {data['RAKE']} \n\n"
-            f" YAKE: {data['YAKE']} \n\n"
-            f" BERT: {data['BERT']} \n\n")
+            f" RAKE: {RAKE_text} \n\n"
+            f" YAKE: {YAKE_text} \n\n"
+            f" BERT: {BERT_text} \n\n")
     data['print_text'] = str1
     # print(str1)
     return data
@@ -325,34 +335,32 @@ def find_type(filename, type='RAKE'):
         RAKE_set.add(m['RAKE_COUNT'])
         YAKE_set.add(m['YAKE_COUNT'])
         BERT_set.add(m['BERT_COUNT'])
-    RAKE_set.remove(0)
-    YAKE_set.remove(0)
-    BERT_set.remove(0)
-    RAKE_set=sorted(RAKE_set, reverse=True)
-    YAKE_set=sorted(YAKE_set, reverse=True)
-    BERT_set=sorted(BERT_set, reverse=True)
-    
+    RAKE_s = max(RAKE_set)
+    YAKE_s = max(YAKE_set)
+    BERT_s = max(BERT_set)
+    # RAKE_set=sorted(RAKE_set, reverse=True)
+    # YAKE_set=sorted(YAKE_set, reverse=True)
+    # BERT_set=sorted(BERT_set, reverse=True)
+    counts=2
     if type == 'RAKE':
-        for s in RAKE_set:
-            for m in messages:
-                if m['RAKE_COUNT'] == s:
-                    m = add_print_text(m)
-                    find_data.append(m['print_text'])
+        for m in messages:
+            if m['RAKE_COUNT'] >= RAKE_s-counts:
+                m = add_print_text(m)
+                find_data.append(m)
     if type == 'YAKE':
-        for s in RAKE_set:
-            for m in messages:
-                if m['YAKE_COUNT'] == s:
-                    m = add_print_text(m)
-                    find_data.append(m['print_text'])                    
+        for m in messages:
+            if m['YAKE_COUNT'] >= YAKE_s-counts:
+                m = add_print_text(m)
+                find_data.append(m)                    
     if type == 'BERT':
-        for s in RAKE_set:
-            for m in messages:
-                if m['BERT_COUNT'] == s:
-                    m = add_print_text(m)
-                    find_data.append(m['print_text'])                     
+        for m in messages:
+            if m['BERT_COUNT'] >= BERT_s-counts:
+                m = add_print_text(m)
+                find_data.append(m)                     
     jsonstring = json.dumps(find_data, ensure_ascii=False)
     with open("./find_d.json", "w", encoding="UTF8") as file:
         file.write(jsonstring)
+    return jsonstring    
 
 
 def convertMs2String(milliseconds):
@@ -388,5 +396,5 @@ if __name__ == '__main__':
     
     # data_proc(filename, save_filename, 32)
     # find_cl(save_filename)
-    find_type("./find_data.json")
+    find_type("./find_data.json", 'RAKE')
     

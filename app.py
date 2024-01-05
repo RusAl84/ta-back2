@@ -39,6 +39,7 @@ def get_pattern():
     msg = request.json
     print(msg)
     data = process_nlp.get_pattern(msg['text'])
+    data = process_nlp.add_print_text(data)
     print(data['print_text'])
     return data
 
@@ -48,6 +49,7 @@ def get_pattern_add():
     msg = request.json
     print(msg)
     data = process_nlp.add_data(msg)
+    data = process_nlp.add_print_text(data)
     print()
     print(data)
     return data
@@ -59,7 +61,11 @@ def findae():
     msg = str(request.json)
     print(msg)
     filename = msg
-    data = process_nlp.find_cl(filename)
+    # filename="d:/ml/chat/andromedica1.json"
+    save_filename="./data_proc.json"
+    # data_proc(filename, save_filename, 32)
+    # find_cl(save_filename)
+    data = process_nlp.find_type("./find_data.json", 'RAKE')
     print(data)
     return data
 
