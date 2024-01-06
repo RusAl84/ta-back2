@@ -58,14 +58,15 @@ def get_pattern_add():
 @app.route('/findae', methods=['POST'])
 def findae():
     #     if request.method == 'POST':
-    msg = str(request.json)
+    msg = request.json
     print(msg)
-    filename = msg
+    filename = msg['filename']
+    ttype=msg['type']
     # filename="d:/ml/chat/andromedica1.json"
     save_filename="./data_proc.json"
     # data_proc(filename, save_filename, 32)
     # find_cl(save_filename)
-    data = process_nlp.find_type("./find_data.json", 'RAKE')
+    data = process_nlp.find_type("./find_data.json", ttype)
     print(data)
     return data
 
